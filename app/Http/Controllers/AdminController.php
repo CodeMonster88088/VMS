@@ -57,14 +57,12 @@ class AdminController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $id,
-            'role' => 'required|string',
         ]);
 
         $user = \App\Models\User::findOrFail($id);
         $user->update([
             'name' => $request->name,
             'email' => $request->email,
-            'role' => $request->role,
         ]);
 
         return redirect()->route('home')->with('success', 'User updated successfully.');

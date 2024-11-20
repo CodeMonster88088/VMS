@@ -14,7 +14,7 @@
             <div class="flex h-16 items-center justify-between">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
-                        <img class="h-8 w-8" src="images/poly4x.png" alt="Your Company">
+                        <img class="h-8 w-8" src="{{ asset('images/poly4x.png') }}" alt="Your Company">
                     </div>
                     <div class="hidden md:block">
                         <div class="ml-10 flex items-baseline space-x-4">
@@ -34,7 +34,7 @@
                         </button>
                         <button type="button" class="relative ml-3 flex items-center rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                             <span class="sr-only">Open user menu</span>
-                            <img class="h-8 w-8 rounded-full" src="images/thumb.png" alt="">
+                            <img class="h-8 w-8 rounded-full" src="{{ asset('images/thumb.png') }}" alt="">
                         </button>
                     </div>
 
@@ -69,7 +69,7 @@
             </div>
             <div class="border-t border-gray-700 pb-3 pt-4">
                 <div class="flex items-center px-5">
-                    <img class="h-10 w-10 rounded-full" src="images/thumb.png" alt="">
+                    <img class="h-10 w-10 rounded-full" src="{{ asset('images/thumb.png') }}" alt="">
                     <div class="ml-3">
                         <div class="text-base font-medium leading-none text-white">Admin</div>
                         <div class="text-sm font-medium leading-none text-gray-400">admin@admin.com</div>
