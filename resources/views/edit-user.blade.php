@@ -21,19 +21,17 @@
             <div class="mb-4">
                 <label for="name" class="block text-sm font-medium text-gray-700">Name:</label>
                 <input type="text" id="name" name="name" value="{{ $user->name }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
+                @error('name')
+                <span class="text-red-500 text-sm">{{ $message }}</span>
+                @enderror
             </div>
 
             <div class="mb-4">
                 <label for="email" class="block text-sm font-medium text-gray-700">Email:</label>
                 <input type="email" id="email" name="email" value="{{ $user->email }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
-            </div>
-
-            <div class="mb-4">
-                <label for="role" class="block text-sm font-medium text-gray-700">Role:</label>
-                <select id="role" name="role" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
-                    <option value="user" {{ $user->role === 'user' ? 'selected' : '' }}>User</option>
-                    <option value="admin" {{ $user->role === 'admin' ? 'selected' : '' }}>Admin</option>
-                </select>
+                @error('email')
+                <span class="text-red-500 text-sm">{{ $message }}</span>
+                @enderror
             </div>
 
             <div class="flex justify-end">
