@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\SmartcardController;
 
 Route::get('/', function () {
     return view('home' , ['greeting' => 'Hello' , 'name' => 'Ali']);
@@ -30,3 +31,13 @@ Route::delete('/user/{id}', [AdminController::class, 'deleteUser'])->name('delet
 Route::get('/user/{id}/edit', [AdminController::class, 'editUser'])->name('edit.user');
 
 Route::put('/user/{id}', [AdminController::class, 'updateUser'])->name('update.user');
+//card reader route
+Route::get('/card-reader', [SmartcardController::class, 'show'])->name('card.reader');
+Route::post('/read-card', [SmartcardController::class, 'readCard'])->name('card.read');
+//Route::post('/card-reader/checkin', [SmartcardController::class, 'checkin'])->name('card.checkin');
+//Route::post('/card-reader/checkout', [SmartcardController::class, 'checkout'])->name('card.checkout');
+
+
+
+
+
