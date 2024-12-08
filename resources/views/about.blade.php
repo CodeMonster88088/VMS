@@ -57,11 +57,12 @@
                 <tr><td class="px-4 py-2 text-gray-700">ArabicFullName</td><td><input type="text" id="arabicFullName" class="w-full p-2 border border-gray-300 rounded-md" /></td></tr>
                 <tr><td class="px-4 py-2 text-gray-700">BirthDate</td><td><input type="text" id="birthDate" class="w-full p-2 border border-gray-300 rounded-md" /></td></tr>
                 <tr><td class="px-4 py-2 text-gray-700">CardCountry</td><td><input type="text" id="cardCountry" class="w-full p-2 border border-gray-300 rounded-md" /></td></tr>
-                <tr><td class="px-4 py-2 text-gray-700">CardExpiryDate</td><td><input type="text" id="CardexpiryDate" class="w-full p-2 border border-gray-300 rounded-md" /></td></tr>
+                <tr><td class="px-4 py-2 text-gray-700">CardExpiryDate</td><td><input type="text" id="cardexpiryDate" class="w-full p-2 border border-gray-300 rounded-md" /></td></tr>
                 <tr><td class="px-4 py-2 text-gray-700">CardSerialNumber</td><td><input type="text" id="cardSerialNumber" class="w-full p-2 border border-gray-300 rounded-md" /></td></tr>
                 <tr><td class="px-4 py-2 text-gray-700">Gender</td><td><input type="text" id="gender" class="w-full p-2 border border-gray-300 rounded-md" /></td></tr>
                 <tr><td class="px-4 py-2 text-gray-700">NationalityCode</td><td><input type="text" id="nationalityCode" class="w-full p-2 border border-gray-300 rounded-md" /></td></tr>
                 <tr><td class="px-4 py-2 text-gray-700">PassportNumber</td><td><input type="text" id="passportNumber" class="w-full p-2 border border-gray-300 rounded-md" /></td></tr>
+                <tr style="display: none;"><td class="px-4 py-2 text-gray-700">Photo</td><td><input type="text" id="photo" class="w-full p-2 border border-gray-300 rounded-md" /></td></tr>
                 </tbody>
             </table>
         </div>
@@ -101,7 +102,6 @@
                         $('#btnReadSmartcard').prop("disabled", false);
 
                         var objData = data;  // Assuming data is already an object
-
                         // Fill the input fields dynamically
                         const fields = [
                             'Photo', 'AddressArabic', 'AddressEnglish', 'ArabicFullName', 'BirthDate',
@@ -119,7 +119,6 @@
                             $('#Photo').attr('src', 'data:image/png;base64,' + objData['Photo']);
                         }
                         $('#IdNumber').val(objData["IdNumber"]);
-                        $('#CardexpiryDate').val(objData["CardexpiryDate"]);
 
                     },
                     error: function (xhr, tst, err) {
@@ -144,10 +143,10 @@
                     gender: $('#gender').val(),
                     nationality_code: $('#nationalityCode').val(),
                     passport_number: $('#passportNumber').val(),
-                    photo: $('#photo').attr('src'),
+                    photo: $('#photo').val(),
                     checkin_time: new Date().toISOString(),  // Current timestamp as check-in time
                 };
-
+                console.log('FormData for Check-in:', formData);  // For debugging
                 $.ajax({
                     type: "POST",
                     url: "/api/save-checkin",  // Your actual route
