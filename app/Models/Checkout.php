@@ -9,16 +9,15 @@ class Checkout extends Model
 {
     use HasFactory;
 
-    protected $table = 'checkout';
+    // Ensure this matches your actual table name
+    protected $table = 'checkouts'; // Updated from 'checkout'
 
+    // Fillable fields that can be mass-assigned
     protected $fillable = [
-        'card_number',
-        'name',
-        'nationality',
-        'checkout_time',
+        'id_number',
+        'arabic_full_name',
         'address_arabic',
         'address_english',
-        'arabic_full_name',
         'birth_date',
         'card_country',
         'card_expiry_date',
@@ -29,11 +28,9 @@ class Checkout extends Model
         'photo',  // Assuming you're storing base64 encoded photo
     ];
 
-    // Optionally, you can add date casting for any date fields (if you store them as date objects)
+    // Specify which fields should be cast as dates
     protected $dates = [
-        'birth_date', 'checkout_time', 'card_expiry_date'
+        'birth_date',
+        'card_expiry_date',
     ];
-
-    // If you are storing the photo in a different format or external storage,
-    // you can create a custom attribute or accessor for handling the photo field.
 }

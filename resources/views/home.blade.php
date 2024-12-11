@@ -6,11 +6,17 @@
                 return confirm('Are you sure you want to delete this user?');
             }
         </script>
-
     </x-slot:heading>
 
     <!-- Greeting Section -->
-    <h1>{{ $greeting }}. From the home page, my name is {{ $name }}.</h1>
+    <h1>{{ $greeting ?? 'Hello' }}. From the home page, my name is {{ $name ?? 'Guest' }}.</h1>
+
+    @if(Auth::check())
+        <p>Logged in as: {{ Auth::user()->name }} ({{ Auth::user()->email }})</p>
+    @else
+        <p>No user is logged in.</p>
+    @endif
+
 
     <!-- Registration Form -->
     <div class="mt-10">
@@ -25,7 +31,6 @@
 
         <form action="{{ route('register.user') }}" method="POST" class="bg-white shadow-md rounded px-8 pt-6 pb-8">
             @csrf
-
             <div class="mb-4">
                 <label for="name" class="block text-sm font-medium text-gray-700">Name:</label>
                 <input type="text" id="name" name="name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
@@ -81,20 +86,20 @@
             </tr>
             </thead>
             <tbody>
-            @foreach ($users as $user)
+            @foreach ($users ?? [] as $user)
                 <tr>
                     <td class="px-4 py-2 border-b text-sm text-gray-700">{{ $user->name }}</td>
                     <td class="px-4 py-2 border-b text-sm text-gray-700">{{ $user->email }}</td>
                     <td class="px-4 py-2 border-b text-sm text-gray-700">{{ $user->role }}</td>
                     <td class="px-4 py-2 border-b text-sm text-gray-700">
-                        @if ($user->role !== 'admin') <!-- Only show Delete button for non-admin users -->
-                        <form action="{{ route('delete.user', $user->id) }}" method="POST" class="inline-block" onsubmit="return confirmDelete()">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="bg-red-500 text-white px-2 py-1 rounded">
-                                Delete
-                            </button>
-                        </form>
+                        @if ($user->role !== 'admin')
+                            <form action="{{ route('delete.user', $user->id) }}" method="POST" class="inline-block" onsubmit="return confirmDelete()">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="bg-red-500 text-white px-2 py-1 rounded">
+                                    Delete
+                                </button>
+                            </form>
                         @endif
                         <a href="{{ route('edit.user', $user->id) }}" class="bg-blue-500 text-white px-2 py-1 rounded">Edit</a>
                     </td>
@@ -103,4 +108,39 @@
             </tbody>
         </table>
     </div>
+    <!-- Visitor Log -->
+    <div class="mt-10">
+        <h2 class="text-lg font-bold mb-4">Visitor Log</h2>
+
+        @if(isset($visitors) && $visitors->isNotEmpty())
+            <!-- Display Visitor Log Table -->
+            <table class="min-w-full bg-white shadow-md rounded">
+                <thead>
+                <tr>
+                    <th class="px-4 py-2 border-b text-left text-sm font-medium text-gray-700">ID Number</th>
+                    <th class="px-4 py-2 border-b text-left text-sm font-medium text-gray-700">Name</th>
+                    <th class="px-4 py-2 border-b text-left text-sm font-medium text-gray-700">Check-in Time</th>
+                    <th class="px-4 py-2 border-b text-left text-sm font-medium text-gray-700">Check-out Time</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach ($visitors as $visitor)
+                    <tr>
+                        <td class="px-4 py-2 border-b text-sm text-gray-700">{{ $visitor->id_number }}</td>
+                        <td class="px-4 py-2 border-b text-sm text-gray-700">
+                            <a href="{{ route('visitors.details', $visitor->id) }}" class="text-indigo-600 underline">
+                                {{ $visitor->arabic_full_name }}
+                            </a>
+                        </td>
+                        <td class="px-4 py-2 border-b text-sm text-gray-700">{{ $visitor->checkin_time ?? 'N/A' }}</td>
+                        <td class="px-4 py-2 border-b text-sm text-gray-700">{{ $visitor->checkout_time ?? 'Still Checked-in' }}</td>
+                    </tr>
+                @endforeach
+                </tbody>
+            </table>
+        @else
+            <p>No visitors found.</p>
+        @endif
+    </div>
+
 </x-layout>

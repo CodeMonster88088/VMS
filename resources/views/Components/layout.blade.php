@@ -22,6 +22,10 @@
                             <x-nav-link href="/" :active="request()->is('/')">Home</x-nav-link>
                             <x-nav-link href="/about" :active="request()->is('about')">About</x-nav-link>
                             <x-nav-link href="/contact" :active="request()->is('contact')">Contact</x-nav-link>
+                            @if(Auth::check() && Auth::user()->isAdmin)
+                                <x-nav-link href="/users" :active="request()->is('users')">Users</x-nav-link>
+                            @endif
+
                         </div>
                     </div>
                 </div>

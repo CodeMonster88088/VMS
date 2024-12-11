@@ -9,6 +9,21 @@ use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
+    protected $casts = [
+        'isAdmin' => 'boolean',
+    ];
+
+    // Optional: you can add an accessor if needed
+    public function getIsAdminAttribute()
+    {
+        return $this->attributes['isAdmin'] == 1;
+    }
+
+    public function isAdmin()
+    {
+        return $this->attributes['isAdmin'] == 1;
+    }
+
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
@@ -21,7 +36,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role',
+        'isAdmin',
     ];
 
     /**

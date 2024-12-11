@@ -167,24 +167,39 @@
             // Checkout Button Click
             $('#btnCheckout').click(function () {
                 let formData = {
-                    card_number: $('#IdNumber').val(),
-                    name: $('#arabicFullName').val(),
-                    checkout_time: new Date().toISOString(),
+                    id_number: $('#IdNumber').val(),
+                    photo: $('#Photo').attr('src'),
+                    address_arabic: $('#addressArabic').val(),
+                    address_english: $('#addressEnglish').val(),
+                    arabic_full_name: $('#arabicFullName').val(),
+                    birth_date: formatDate($('#birthDate').val()), // Ensure proper format
+                    card_country: $('#cardCountry').val(),
+                    card_expiry_date: $('#CardexpiryDate').val(),
+                    card_serial_number: $('#cardSerialNumber').val(),
+                    gender: $('#gender').val(),
+                    nationality_code: $('#nationalityCode').val(),
+                    passport_number: $('#passportNumber').val(),
                 };
 
                 $.ajax({
                     type: "POST",
-                    url: "/api/save-checkout",  // Modify with your actual backend route
+                    url: "/api/save-checkout",
                     data: JSON.stringify(formData),
                     contentType: "application/json",
                     success: function (data) {
                         $('#message').html('<div class="text-blue-600">Checkout successful!</div>');
                     },
-                    error: function (xhr, tst, err) {
+                    error: function (xhr) {
                         $('#message').html('<div class="text-red-600">Error: ' + xhr.responseText + '</div>');
                     }
                 });
             });
+
+            function formatDate(date) {
+                const [month, day, year] = date.split('/');
+                return `${year}-${month}-${day}`; // Convert to YYYY-MM-DD
+            }
+
         });
     </script>
 </x-layout>

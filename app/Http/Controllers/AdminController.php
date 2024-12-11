@@ -4,21 +4,27 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
 {
-    public function showHomePage()
+    public function showUsersPage()
     {
-        // Retrieve all users from the database
-        $users = User::all();
+        // Ensure only admin can access this page
+        if (!Auth::check() || !Auth::user()->isAdmin) {
+            return redirect('/')->with('error', 'Unauthorized access');
+        }
 
-        // Pass data to the home view
-        return view('home', [
-            'greeting' => 'Hello',
-            'name' => 'Ali',
+        // Fetch users from the database
+        $users = \App\Models\User::all(); // You can add filters here if needed
+
+        // Pass data to the users view
+        return view('users', [
             'users' => $users,
         ]);
     }
+
+
     public function deleteUser($id)
     {
         \App\Models\User::findOrFail($id)->delete();
