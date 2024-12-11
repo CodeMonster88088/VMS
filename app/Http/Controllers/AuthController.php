@@ -13,19 +13,17 @@ class AuthController extends Controller
     }
     public function login(Request $request)
     {
-        // Validate the form data
         $request->validate([
             'email' => 'required|email',
             'password' => 'required',
         ]);
 
-        // Attempt to log the user in
         if (Auth::attempt($request->only('email', 'password'))) {
-            // Authentication passed; redirect to intended page or dashboard
-            return redirect()->intended('/'); // Change /dashboard to your desired route
+            // Refresh the user instance to load all fields, including 'role'
+            Auth::user()->refresh();
+            return redirect()->intended('/');
         }
 
-        // If login fails, throw a validation error
         throw ValidationException::withMessages([
             'email' => [trans('auth.failed')],
         ]);
