@@ -77,14 +77,14 @@
                     <td class="px-4 py-2 border-b text-sm text-gray-700">{{ $user->email }}</td>
                     <td class="px-4 py-2 border-b text-sm text-gray-700">{{ $user->role }}</td>
                     <td class="px-4 py-2 border-b text-sm text-gray-700">
-                        @if ($user->isAdmin)
-                            <form action="{{ route('delete.user', $user->id) }}" method="POST" class="inline-block" onsubmit="return confirmDelete()">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="bg-red-500 text-white px-2 py-1 rounded">
-                                    Delete
-                                </button>
-                            </form>
+                        @if ($user->role !== 'admin')  <!-- Show delete only if not admin -->
+                        <form action="{{ route('delete.user', $user->id) }}" method="POST" class="inline-block" onsubmit="return confirmDelete()">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="bg-red-500 text-white px-2 py-1 rounded">
+                                Delete
+                            </button>
+                        </form>
                         @endif
                         <a href="{{ route('edit.user', $user->id) }}" class="bg-blue-500 text-white px-2 py-1 rounded">Edit</a>
                     </td>

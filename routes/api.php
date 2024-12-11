@@ -1,15 +1,15 @@
 <?php
 // routes/api.php
 
+use App\Http\Controllers\VisitorController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SmartcardController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CheckinController;
 
-Route::post('save-checkin', [CheckinController::class, 'save']);
-
-Route::post('save-checkout', [CheckoutController::class, 'save'])->name('checkout.save');
-Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+Route::post('save-checkin', [VisitorController::class, 'checkIn'])->name('checkin.save');
+Route::post('/validate-checkin', [VisitorController::class, 'validateCheckin']);
+Route::post('save-checkout', [VisitorController::class, 'checkOut'])->name('checkout.save');
 Route::get('/checkout/{id}', [CheckoutController::class, 'show'])->name('checkout.show');
 
 //Route::post('/smartcard/read-card', [SmartcardController::class, 'readCard']);

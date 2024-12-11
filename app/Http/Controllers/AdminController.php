@@ -60,19 +60,32 @@ class AdminController extends Controller
 
     public function updateUser(Request $request, $id)
     {
+        // Validate the request inputs
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $id,
+            'password' => 'nullable|string|min:8|confirmed', // Validate password only if provided
         ]);
 
+        // Find the user by ID
         $user = \App\Models\User::findOrFail($id);
+
+        // Update the user's name and email
         $user->update([
             'name' => $request->name,
             'email' => $request->email,
         ]);
 
+        // If a password is provided, update it
+        if ($request->filled('password')) {
+            $user->update([
+                'password' => bcrypt($request->password),
+            ]);
+        }
+
         return redirect()->route('home')->with('success', 'User updated successfully.');
     }
+
 
 }
 

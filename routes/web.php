@@ -22,7 +22,10 @@ Route::post('/read-card', [SmartcardController::class, 'readCard'])->name('card.
 
 // Visitor routes
 Route::get('/visitor-log', [VisitorController::class, 'visitorLog'])->name('visitor.log');
+Route::get('/visitors', [VisitorController::class, 'index'])->name('visitors.index'); // Visitor log with search
 Route::get('/visitors/{id}', [VisitorController::class, 'show'])->name('visitors.details');
+Route::post('/visitor/{id}/checkout', [VisitorController::class, 'checkout'])->name('visitor.checkout');
+
 
 // Admin-only routes
 //Route::middleware(['auth', 'admin'])->group(function () {

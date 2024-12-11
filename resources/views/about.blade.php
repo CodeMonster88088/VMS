@@ -1,7 +1,6 @@
 <x-layout>
     <x-slot:heading>
         Reading Smartcard Using RESTful Service
-
     </x-slot:heading>
 
     <div class="container mx-auto mt-10 px-4">
@@ -29,11 +28,6 @@
                     <!-- Checkin Button -->
                     <button type="button" id="btnCheckin" class="py-2 px-4 bg-green-600 text-white font-semibold rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
                         Checkin
-                    </button>
-
-                    <!-- Checkout Button -->
-                    <button type="button" id="btnCheckout" class="py-2 px-4 bg-red-600 text-white font-semibold rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
-                        Checkout
                     </button>
                 </div>
             </form>
@@ -72,6 +66,7 @@
     </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
     <script type="text/javascript">
         $(function () {
             // Read Smartcard Button
@@ -102,10 +97,9 @@
                         $('#btnReadSmartcard').prop("disabled", false);
 
                         var objData = data;  // Assuming data is already an object
-                        // Fill the input fields dynamically
                         const fields = [
                             'Photo', 'AddressArabic', 'AddressEnglish', 'ArabicFullName', 'BirthDate',
-                            'CardCountry', 'CardSerialNumber', 'Gender', 'NationalityCode', 'PassportNumber','CardexpiryDate'
+                            'CardCountry', 'CardSerialNumber', 'Gender', 'NationalityCode', 'PassportNumber', 'CardexpiryDate'
                         ];
 
                         fields.forEach(field => {
@@ -119,7 +113,6 @@
                             $('#Photo').attr('src', 'data:image/png;base64,' + objData['Photo']);
                         }
                         $('#IdNumber').val(objData["IdNumber"]);
-
                     },
                     error: function (xhr, tst, err) {
                         $("#btnReadSmartcard").text('Read Smartcard');
@@ -131,25 +124,35 @@
 
             // Checkin Button Click
             $('#btnCheckin').click(function () {
+                const rawBirthDate = $('#birthDate').val(); // Raw date entered by the user
+
+                // Function to reformat DD/MM/YYYY to YYYY-MM-DD
+                function formatDate(date) {
+                    if (!date) return null; // Handle empty date
+                    const parts = date.split('/');
+                    if (parts.length !== 3) return null; // Invalid date format
+                    return `${parts[2]}-${parts[1]}-${parts[0]}`; // YYYY-MM-DD format
+                }
+
                 let formData = {
-                    id_number: $('#IdNumber').val(),  // Assuming this is an updated field
+                    id_number: $('#IdNumber').val(),
                     address_arabic: $('#addressArabic').val(),
                     address_english: $('#addressEnglish').val(),
                     arabic_full_name: $('#arabicFullName').val(),
-                    birth_date: $('#birthDate').val(),
+                    birth_date: formatDate(rawBirthDate), // Reformat birth_date to YYYY-MM-DD
                     card_country: $('#cardCountry').val(),
-                    card_expiry_date: $('#cardExpiryDate').val(),
+                    card_expiry_date: $('#cardexpiryDate').val(),
                     card_serial_number: $('#cardSerialNumber').val(),
                     gender: $('#gender').val(),
                     nationality_code: $('#nationalityCode').val(),
                     passport_number: $('#passportNumber').val(),
                     photo: $('#photo').val(),
-                    checkin_time: new Date().toISOString(),  // Current timestamp as check-in time
+                    checkin_time: new Date().toISOString()
                 };
-                console.log('FormData for Check-in:', formData);  // For debugging
+
                 $.ajax({
                     type: "POST",
-                    url: "/api/save-checkin",  // Your actual route
+                    url: "/api/save-checkin", // Your backend endpoint
                     data: JSON.stringify(formData),
                     contentType: "application/json",
                     headers: {
@@ -163,43 +166,7 @@
                     }
                 });
             });
-
-            // Checkout Button Click
-            $('#btnCheckout').click(function () {
-                let formData = {
-                    id_number: $('#IdNumber').val(),
-                    photo: $('#Photo').attr('src'),
-                    address_arabic: $('#addressArabic').val(),
-                    address_english: $('#addressEnglish').val(),
-                    arabic_full_name: $('#arabicFullName').val(),
-                    birth_date: formatDate($('#birthDate').val()), // Ensure proper format
-                    card_country: $('#cardCountry').val(),
-                    card_expiry_date: $('#CardexpiryDate').val(),
-                    card_serial_number: $('#cardSerialNumber').val(),
-                    gender: $('#gender').val(),
-                    nationality_code: $('#nationalityCode').val(),
-                    passport_number: $('#passportNumber').val(),
-                };
-
-                $.ajax({
-                    type: "POST",
-                    url: "/api/save-checkout",
-                    data: JSON.stringify(formData),
-                    contentType: "application/json",
-                    success: function (data) {
-                        $('#message').html('<div class="text-blue-600">Checkout successful!</div>');
-                    },
-                    error: function (xhr) {
-                        $('#message').html('<div class="text-red-600">Error: ' + xhr.responseText + '</div>');
-                    }
-                });
-            });
-
-            function formatDate(date) {
-                const [month, day, year] = date.split('/');
-                return `${year}-${month}-${day}`; // Convert to YYYY-MM-DD
-            }
-
         });
     </script>
+
 </x-layout>
