@@ -44,7 +44,13 @@ Route::get('/user/{id}/edit', [AdminController::class, 'editUser'])->name('edit.
 Route::post('/register-user', [AdminController::class, 'registerUser'])->name('register.user');
 Route::put('/user/{id}', [AdminController::class, 'updateUser'])->name('update.user');
 Route::get('/admin-dashboard', [AdminController::class, 'showHomePage'])->name('admin.dashboard');
+Route::get('/visitors/{id}/edit', [VisitorController::class, 'edit'])->name('visitors.edit');
+Route::delete('/visitors/{id}', [VisitorController::class, 'destroy'])->name('visitors.destroy');
+Route::put('/visitors/{id}', [VisitorController::class, 'update'])->name('visitors.update');
 
 
 // Avoid duplicate route names
 Route::get('/home', [VisitorController::class, 'visitorLog'])->name('visitor.log.home');
+//export
+Route::get('/visitors/report/pdf', [VisitorController::class, 'exportPDF'])->name('visitors.report.pdf');
+Route::get('/visitors/report/excel', [VisitorController::class, 'exportExcel'])->name('visitors.report.excel');
