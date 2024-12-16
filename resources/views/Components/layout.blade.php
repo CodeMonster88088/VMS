@@ -77,8 +77,8 @@
                 <div class="flex items-center px-5">
                     <img class="h-10 w-10 rounded-full" src="{{ asset('images/thumb.png') }}" alt="">
                     <div class="ml-3">
-{{--                        <div class="text-base font-medium leading-none text-white">{{ Auth::user()->name }}</div>--}}
-{{--                        <div class="text-sm font-medium leading-none text-gray-400">{{ Auth::user()->email }}</div>--}}
+                        <div class="text-base font-medium leading-none text-white">{{ Auth::user()->name }}</div>
+                        <div class="text-sm font-medium leading-none text-gray-400">{{ Auth::user()->email }}</div>
                     </div>
                 </div>
 
