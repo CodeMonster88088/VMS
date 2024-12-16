@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\ActivityLog; // Include the ActivityLog model
 use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
@@ -12,31 +13,56 @@ class AdminController extends Controller
     {
         // Ensure only admin can access this page
         if (!Auth::check() || !Auth::user()->isAdmin) {
-            return redirect('/')->with('error', 'Unauthorized access');
+            abort(403, 'Unauthorized access');
         }
 
-        // Fetch users from the database
-        $users = \App\Models\User::all(); // You can add filters here if needed
+        // Fetch users
+        $users = \App\Models\User::all();
 
-        // Pass data to the users view
-        return view('users', [
-            'users' => $users,
-        ]);
+        // Fetch activity logs, paginated
+        $logs = ActivityLog::with('user') // Eager load the related user
+        ->orderBy('created_at', 'desc') // Sort logs by latest
+        ->paginate(10); // Paginate logs
+
+        // Pass both users and logs to the view
+        return view('users', compact('users', 'logs'));
     }
 
 
     public function deleteUser($id)
     {
-        \App\Models\User::findOrFail($id)->delete();
-        return redirect()->route('home')->with('success', 'User deleted successfully.');
+        $user = \App\Models\User::findOrFail($id);
+
+        // Log the deletion action
+        ActivityLog::create([
+            'user_id' => Auth::id(),
+            'action' => 'Delete',
+            'module' => 'Users',
+            'details' => 'Deleted user with ID ' . $id,
+            'ip_address' => request()->ip(),
+        ]);
+
+        // Delete the user
+        $user->delete();
+
+        return redirect()->route('users.manage')->with('success', 'User deleted successfully.');
     }
 
     public function editUser($id)
     {
         $user = \App\Models\User::findOrFail($id); // Retrieve the user by ID or fail if not found
+
+        // Log the edit action
+        ActivityLog::create([
+            'user_id' => Auth::id(),
+            'action' => 'Edit',
+            'module' => 'Users',
+            'details' => 'Accessed edit page for user with ID ' . $id,
+            'ip_address' => request()->ip(),
+        ]);
+
         return view('edit-user', compact('user')); // Pass the user data to the edit view
     }
-
 
     public function registerUser(Request $request)
     {
@@ -45,17 +71,25 @@ class AdminController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
-
         ]);
 
-        \App\Models\User::create([
+        $user = \App\Models\User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => \Illuminate\Support\Facades\Hash::make($request->password),
             'role' => 'user', // Hard-code role as 'user'
         ]);
 
-        return redirect()->route('home')->with('success', 'User registered successfully.');
+        // Log the registration action
+        ActivityLog::create([
+            'user_id' => Auth::id(),
+            'action' => 'Create',
+            'module' => 'Users',
+            'details' => 'Registered a new user with ID ' . $user->id,
+            'ip_address' => request()->ip(),
+        ]);
+
+        return redirect()->route('users.manage')->with('success', 'User registered successfully.');
     }
 
     public function updateUser(Request $request, $id)
@@ -83,10 +117,15 @@ class AdminController extends Controller
             ]);
         }
 
-        return redirect()->route('home')->with('success', 'User updated successfully.');
+        // Log the update action
+        ActivityLog::create([
+            'user_id' => Auth::id(),
+            'action' => 'Update',
+            'module' => 'Users',
+            'details' => 'Updated user with ID ' . $id,
+            'ip_address' => request()->ip(),
+        ]);
+
+        return redirect()->route('users.manage')->with('success', 'User updated successfully.');
     }
-
-
 }
-
-

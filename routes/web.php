@@ -7,9 +7,22 @@ use App\Http\Controllers\SmartcardController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes
-Route::get('/', [VisitorController::class, 'visitorLog'])->name('home');
-Route::get('/about', fn() => view('about'))->name('about');
-Route::get('/contact', fn() => view('contact'))->name('contact');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/', [VisitorController::class, 'visitorLog'])->name('home');
+    Route::get('/about', fn() => view('about'))->name('about');
+    Route::get('/contact', fn() => view('contact'))->name('contact');
+    // Visitor Management Routes
+    Route::get('/visitors/{id}/edit', [VisitorController::class, 'edit'])->name('visitors.edit');
+    Route::delete('/visitors/{id}', [VisitorController::class, 'destroy'])->name('visitors.destroy');
+    Route::put('/visitors/{id}', [VisitorController::class, 'update'])->name('visitors.update');
+    // Visitor routes
+    Route::get('/visitor-log', [VisitorController::class, 'visitorLog'])->name('visitor.log');
+    Route::get('/visitors', [VisitorController::class, 'index'])->name('visitors.index'); // Visitor log with search
+    Route::post('/visitor/{id}/checkout', [VisitorController::class, 'checkout'])->name('visitor.checkout');
+    Route::get('/visitors/{id}', [VisitorController::class, 'show'])->name('visitors.details');
+    // Avoid duplicate route names
+    Route::get('/home', [VisitorController::class, 'visitorLog'])->name('visitor.log.home');
+});
 
 // Authentication routes
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -20,37 +33,46 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/card-reader', [SmartcardController::class, 'show'])->name('card.reader');
 Route::post('/read-card', [SmartcardController::class, 'readCard'])->name('card.read');
 
-// Visitor routes
-Route::get('/visitor-log', [VisitorController::class, 'visitorLog'])->name('visitor.log');
-Route::get('/visitors', [VisitorController::class, 'index'])->name('visitors.index'); // Visitor log with search
-Route::get('/visitors/{id}', [VisitorController::class, 'show'])->name('visitors.details');
-Route::post('/visitor/{id}/checkout', [VisitorController::class, 'checkout'])->name('visitor.checkout');
 
 
-// Admin-only routes
-//Route::middleware(['auth', 'admin'])->group(function () {
-//    Route::get('/users', [AdminController::class, 'showUsersPage'])->name('users.manage');
-//    Route::get('/admin-dashboard', [AdminController::class, 'showHomePage'])->name('admin.dashboard');
-//    Route::delete('/user/{id}', [AdminController::class, 'deleteUser'])->name('delete.user');
-//    Route::get('/user/{id}/edit', [AdminController::class, 'editUser'])->name('edit.user');
-//    Route::post('/register-user', [AdminController::class, 'registerUser'])->name('register.user');
-//    Route::put('/user/{id}', [AdminController::class, 'updateUser'])->name('update.user');
-//});
-
-Route::get('/users', [AdminController::class, 'showUsersPage'])->name('users.manage');
-Route::get('/admin-dashboard', [AdminController::class, 'showHomePage'])->name('admin.dashboard');
-Route::delete('/user/{id}', [AdminController::class, 'deleteUser'])->name('delete.user');
-Route::get('/user/{id}/edit', [AdminController::class, 'editUser'])->name('edit.user');
-Route::post('/register-user', [AdminController::class, 'registerUser'])->name('register.user');
-Route::put('/user/{id}', [AdminController::class, 'updateUser'])->name('update.user');
-Route::get('/admin-dashboard', [AdminController::class, 'showHomePage'])->name('admin.dashboard');
-Route::get('/visitors/{id}/edit', [VisitorController::class, 'edit'])->name('visitors.edit');
-Route::delete('/visitors/{id}', [VisitorController::class, 'destroy'])->name('visitors.destroy');
-Route::put('/visitors/{id}', [VisitorController::class, 'update'])->name('visitors.update');
 
 
-// Avoid duplicate route names
-Route::get('/home', [VisitorController::class, 'visitorLog'])->name('visitor.log.home');
-//export
-Route::get('/visitors/report/pdf', [VisitorController::class, 'exportPDF'])->name('visitors.report.pdf');
-Route::get('/visitors/report/excel', [VisitorController::class, 'exportExcel'])->name('visitors.report.excel');
+
+
+Route::middleware([\App\Http\Middleware\AdminMiddleware::class])->get('/test-admin', function () {
+    return 'Middleware works!';
+});
+
+
+
+
+
+// User Management Routes
+route::middleware([\App\Http\Middleware\AdminMiddleware::class])->group(function () {
+    Route::get('/users', [AdminController::class, 'showUsersPage'])->name('users.manage');
+    Route::delete('/user/{id}', [AdminController::class, 'deleteUser'])->name('delete.user');
+    Route::get('/user/{id}/edit', [AdminController::class, 'editUser'])->name('edit.user');
+    Route::post('/register-user', [AdminController::class, 'registerUser'])->name('register.user');
+    Route::put('/user/{id}', [AdminController::class, 'updateUser'])->name('update.user');
+    //export
+    Route::get('/visitors/report/pdf', [VisitorController::class, 'exportPDF'])->name('visitors.report.pdf');
+    Route::get('/visitors/report/excel', [VisitorController::class, 'exportExcel'])->name('visitors.report.excel');
+});
+
+//Route::get('/users', [AdminController::class, 'showUsersPage'])->name('users.manage');
+//Route::delete('/user/{id}', [AdminController::class, 'deleteUser'])->name('delete.user');
+//Route::get('/user/{id}/edit', [AdminController::class, 'editUser'])->name('edit.user');
+//Route::post('/register-user', [AdminController::class, 'registerUser'])->name('register.user');
+//Route::put('/user/{id}', [AdminController::class, 'updateUser'])->name('update.user');
+
+
+
+Route::get('/admin/logs', function () {
+    $logs = \App\Models\ActivityLog::with('user')->latest()->paginate(50);
+    return view('admin.logs', compact('logs'));
+})->middleware('auth', 'isAdmin');
+
+
+
+
+

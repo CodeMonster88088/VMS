@@ -2,29 +2,13 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Http\Middleware\AdminMiddleware;
 
 class User extends Authenticatable
 {
-    protected $casts = [
-        'isAdmin' => 'boolean',
-    ];
-
-    // Optional: you can add an accessor if needed
-    public function getIsAdminAttribute()
-    {
-        return $this->attributes['isAdmin'] == 1;
-    }
-
-    public function isAdmin()
-    {
-        return $this->attributes['isAdmin'] == 1;
-    }
-
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
     /**
@@ -36,7 +20,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'isAdmin',
+        'isAdmin', // Include isAdmin in the fillable attributes
     ];
 
     /**
@@ -50,15 +34,28 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * The attributes that should be cast to native types.
      *
-     * @return array<string, string>
+     * @var array<string, string>
      */
-    protected function casts(): array
+    protected $casts = [
+        'isAdmin' => 'boolean', // Automatically cast isAdmin as a boolean
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed', // New hash casting in Laravel 10+
+    ];
+
+    /**
+     * Check if the user is an admin.
+     *
+     * @return bool
+     */
+    public function isAdmin(): bool
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return $this->isAdmin; // Use the casted boolean property
     }
+    public function getIsAdminAttribute($value)
+    {
+        return (bool) $this->attributes['isAdmin'];
+    }
+
 }
