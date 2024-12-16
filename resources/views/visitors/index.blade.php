@@ -6,9 +6,10 @@
     <div class="mt-10 max-w-6xl mx-auto p-6 bg-white shadow-lg rounded-lg">
         <h2 class="text-2xl font-bold text-indigo-600 mb-6">Visitor Log</h2>
 
-        <!-- Search Bar -->
-        <div class="mb-6">
-            <form method="GET" action="{{ route('visitors.index') }}" class="flex items-center space-x-4">
+        <!-- Search and Sort Bar -->
+        <div class="flex items-center justify-between mb-6">
+            <form method="GET" action="{{ route('visitors.index') }}" class="flex items-center space-x-4 w-full">
+                <!-- Search Bar -->
                 <input
                     type="text"
                     name="search"
@@ -21,6 +22,17 @@
                     class="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     Search
                 </button>
+            </form>
+
+            <!-- Sort Dropdown -->
+            <form method="GET" action="{{ route('visitors.index') }}" class="ml-4">
+                <select
+                    name="sort"
+                    onchange="this.form.submit()"
+                    class="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <option value="asc" {{ request('sort') === 'asc' ? 'selected' : '' }}>Check-in Time: Oldest</option>
+                    <option value="desc" {{ request('sort') === 'desc' ? 'selected' : '' }}>Check-in Time: Newest</option>
+                </select>
             </form>
         </div>
 

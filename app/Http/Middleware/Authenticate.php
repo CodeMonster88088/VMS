@@ -22,7 +22,12 @@ class Authenticate
             return $next($request);
         }
 
-        // Redirect unauthenticated users to the login page
-        return redirect()->route('login');
+        // For unauthenticated users, redirect to the login page with an error message
+        if (!$request->expectsJson()) {
+            return redirect()->route('login')->with('error', 'You must log in to access this page.');
+        }
+
+        // If the request expects JSON (e.g., an API), return a 401 Unauthorized response
+        return response()->json(['error' => 'Unauthenticated'], 401);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActivityLog;
 use App\Models\Visitor;
 //use Barryvdh\DomPDF\Facade as PDF; // Correct Facade usage
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -9,6 +10,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\VisitorsExport;
+use Illuminate\Support\Facades\Auth;
+
 
 class VisitorController extends Controller
 {
@@ -22,24 +25,49 @@ class VisitorController extends Controller
                 ->orWhere('arabic_full_name', 'like', "%$search%");
         }
 
-        $visitors = $query->orderBy('checkin_time', 'desc')->get();
+        if ($request->filled('sort')) {
+            $query->orderBy('checkin_time', $request->sort);
+        } else {
+            $query->orderBy('checkin_time', 'desc'); // Default sorting
+        }
+
+        $visitors = $query->get();
 
         return view('visitors.index', compact('visitors'));
     }
 
-    public function edit($id)
+
+    public function edit($id, Request $request)
     {
         $visitor = Visitor::findOrFail($id);
+
+        ActivityLog::create([
+            'user_id' => Auth::id(),
+            'action' => 'Logout',
+            'module' => 'Authentication',
+            'details' => "visitor edited.",
+            'ip_address' => $request->ip(),
+        ]);
+
         return view('visitors.edit', compact('visitor'));
     }
 
-    public function destroy($id)
+    public function destroy($id, Request $request)
     {
         $visitor = Visitor::findOrFail($id);
         $visitor->delete();
 
-        return redirect()->route('visitors.index')->with('success', 'Visitor deleted successfully.');
+        ActivityLog::create([
+            'user_id' => Auth::id(),
+            'action' => 'Delete',
+            'module' => 'Visitors',
+            'details' => "Visitor with ID {$id} deleted.",
+            'ip_address' => $request->ip(),
+        ]);
+
+        return redirect()->route('home')->with('success', 'Visitor deleted successfully.');
     }
+
 
     public function update(Request $request, $id)
     {
@@ -62,6 +90,15 @@ class VisitorController extends Controller
         $visitor = Visitor::findOrFail($id);
         $visitor->update($request->all());
 
+
+        ActivityLog::create([
+            'user_id' => Auth::id(),
+            'action' => 'update',
+            'module' => 'Visitors',
+            'details' => "Visitor updated.",
+            'ip_address' => $request->ip(),
+        ]);
+
         // Redirect back with a success message
         return redirect()->route('visitors.index')->with('success', 'Visitor updated successfully!');
     }
@@ -72,8 +109,16 @@ class VisitorController extends Controller
         return view('home', compact('visitors'));
     }
 
-    public function checkIn(Request $request): \Illuminate\Http\JsonResponse
+    public function checkIn(Request $request)
     {
+        $validatedData = $request->validate([
+            'user_id' => 'required|integer|exists:users,id',
+            'id_number' => 'required|string|max:255',
+            // Add other validations as needed
+        ]);
+        // Process the check-in
+        $visitor = Visitor::create($validatedData);
+
         $validator = Validator::make($request->all(), [
             'id_number' => 'required|string|max:255',
             'photo' => 'nullable|string',
@@ -110,10 +155,15 @@ class VisitorController extends Controller
             'checkout_time' => null,
         ]);
 
-        return response()->json([
-            'message' => 'Visitor checked in successfully!',
-            'visitor' => $visitor,
-        ], 201);
+        ActivityLog::create([
+            'user_id' => $validatedData['user_id'],
+            'action' => 'Check-in',
+            'module' => 'Visitors',
+            'details' => "Checked in visitor with ID {$visitor->id}.",
+            'ip_address' => $request->ip(),
+        ]);
+
+        return response()->json(['message' => 'Visitor checked in successfully!', 'visitor' => $visitor], 201);
     }
 
     public function validateCheckin(Request $request)
@@ -149,8 +199,17 @@ class VisitorController extends Controller
 
         $visitor->update(['checkout_time' => now()]);
 
+        ActivityLog::create([
+            'user_id' => Auth::id(), // Use the authenticated user's ID
+            'action' => 'Check-out',
+            'module' => 'Visitors',
+            'details' => "Checked out visitor with ID {$id}.",
+            'ip_address' => request()->ip(),
+        ]);
+
         return redirect()->back()->with('success', 'Visitor checked out successfully!');
     }
+
 
     public function show($id)
     {
@@ -169,6 +228,8 @@ class VisitorController extends Controller
 
         // Download the generated PDF
         return $pdf->download('visitors_report.pdf');
+
+
     }
     public function exportExcel()
     {
