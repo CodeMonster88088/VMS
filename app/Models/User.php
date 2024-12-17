@@ -21,6 +21,8 @@ class User extends Authenticatable
         'email',
         'password',
         'isAdmin', // Include isAdmin in the fillable attributes
+        'mfa_token',
+        'mfa_expires_at',
     ];
 
     /**
@@ -31,6 +33,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'mfa_token',
     ];
 
     /**
@@ -42,6 +45,7 @@ class User extends Authenticatable
         'isAdmin' => 'boolean', // Automatically cast isAdmin as a boolean
         'email_verified_at' => 'datetime',
         'password' => 'hashed', // New hash casting in Laravel 10+
+        'mfa_expires_at' => 'datetime',
     ];
 
     /**

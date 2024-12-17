@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\MFAController;
 use App\Http\Controllers\VisitorController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
@@ -71,6 +72,20 @@ Route::get('/admin/logs', function () {
     $logs = \App\Models\ActivityLog::with('user')->latest()->paginate(50);
     return view('admin.logs', compact('logs'));
 })->middleware('auth', 'isAdmin');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/mfa-prompt', [MFAController::class, 'showPrompt'])->name('mfa.prompt');
+    Route::post('/mfa-verify', [MFAController::class, 'verifyOTP'])->name('mfa.verify');
+});
+
+
+Route::middleware(['auth', 'mfa'])->group(function () {
+    Route::get('/home', function () {
+        return view('home'); // Replace 'home' with the appropriate view name
+    })->name('home');
+});
+
+
 
 
 
