@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 class UpdateVisitorsTableRemoveUniqueIdNumber extends Migration
 {
@@ -14,8 +15,11 @@ class UpdateVisitorsTableRemoveUniqueIdNumber extends Migration
     public function up()
     {
         Schema::table('visitors', function (Blueprint $table) {
-            // Remove unique constraint from the id_number column
-            $table->dropUnique(['id_number']);
+            // Check if the unique index exists before attempting to drop it
+            $indexes = DB::select("SHOW INDEX FROM visitors WHERE Key_name = 'visitors_id_number_unique'");
+            if (!empty($indexes)) {
+                $table->dropUnique('visitors_id_number_unique');
+            }
         });
     }
 
@@ -27,8 +31,11 @@ class UpdateVisitorsTableRemoveUniqueIdNumber extends Migration
     public function down()
     {
         Schema::table('visitors', function (Blueprint $table) {
-            // Re-add unique constraint to the id_number column
-            $table->unique('id_number');
+            // Re-add the unique constraint only if it doesn't already exist
+            $indexes = DB::select("SHOW INDEX FROM visitors WHERE Key_name = 'visitors_id_number_unique'");
+            if (empty($indexes)) {
+                $table->unique('id_number');
+            }
         });
     }
 }

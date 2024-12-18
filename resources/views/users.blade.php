@@ -80,7 +80,7 @@
                     <td class="px-4 py-2 border-b text-sm text-gray-700">{{ $user->email }}</td>
                     <td class="px-4 py-2 border-b text-sm text-gray-700">{{ $user->role }}</td>
                     <td class="px-4 py-2 border-b text-sm text-gray-700">
-                        @if ($user->isAdmin()) {{--TODO--}}
+                        @if (!$user->isAdmin()) {{--TODO--}}
                             <form action="{{ route('delete.user', $user->id) }}" method="POST" class="inline-block" onsubmit="return confirmDelete();">
                                 @csrf
                                 @method('DELETE')
