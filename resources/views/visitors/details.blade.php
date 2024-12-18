@@ -24,7 +24,7 @@
             @if($visitor->photo)
                 <div>
                     <strong class="block text-gray-700">Photo:</strong>
-                    <img src="data:image/png;base64,{{ $visitor->photo }}" alt="Visitor Photo" >
+                    <img src="{{ $visitor->photo }}" alt="Visitor Photo">
                 </div>
             @endif
             <div>
