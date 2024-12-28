@@ -32,16 +32,16 @@
                 </div>
                 <div class="hidden md:flex items-center">
                     <div class="relative ml-4 flex items-center">
-                        <button type="button" class="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
-                            <span class="sr-only">View notifications</span>
-                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
-                            </svg>
-                        </button>
-                        <button type="button" class="relative ml-3 flex items-center rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
-                            <span class="sr-only">Open user menu</span>
-                            <img class="h-8 w-8 rounded-full" src="{{ asset('images/thumb.png') }}" alt="">
-                        </button>
+{{--                        <button type="button" class="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">--}}
+{{--                            <span class="sr-only">View notifications</span>--}}
+{{--                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">--}}
+{{--                                <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />--}}
+{{--                            </svg>--}}
+{{--                        </button>--}}
+{{--                        <button type="button" class="relative ml-3 flex items-center rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">--}}
+{{--                            <span class="sr-only">Open user menu</span>--}}
+{{--                            <img class="h-8 w-8 rounded-full" src="{{ asset('images/thumb.png') }}" alt="">--}}
+{{--                        </button>--}}
                     </div>
 
                     <!-- Logout Button (Desktop) -->
@@ -70,12 +70,15 @@
         <div class="md:hidden" id="mobile-menu">
             <div class="space-y-1 px-2 pb-3 pt-2 sm:px-3">
                 <x-nav-link href="/" :active="request()->is('/')">Home</x-nav-link>
-                <x-nav-link href="/about" :active="request()->is('about')">About</x-nav-link>
-                <x-nav-link href="/contact" :active="request()->is('contact')">Contact</x-nav-link>
+                <x-nav-link href="/about" :active="request()->is('about')">Check-in</x-nav-link>
+{{--                <x-nav-link href="/contact" :active="request()->is('contact')">Contact</x-nav-link>--}}
+                @if(Auth::check() && Auth::user()->isAdmin)
+                    <x-nav-link href="/users" :active="request()->is('users')">Users</x-nav-link>
+                @endif
             </div>
             <div class="border-t border-gray-700 pb-3 pt-4">
                 <div class="flex items-center px-5">
-                    <img class="h-10 w-10 rounded-full" src="{{ asset('images/thumb.png') }}" alt="">
+{{--                    <img class="h-10 w-10 rounded-full" src="{{ asset('images/thumb.png') }}" alt="">--}}
                     <div class="ml-3">
                         <div class="text-base font-medium leading-none text-white">{{ Auth::user()->name }}</div>
                         <div class="text-sm font-medium leading-none text-gray-400">{{ Auth::user()->email }}</div>

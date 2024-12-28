@@ -27,7 +27,7 @@
             @if($visitor->photo)
                 <div>
                     <label class="block text-gray-700 font-medium">Photo:</label>
-                    <img src="data:image/png;base64,{{ $visitor->photo }}" alt="Visitor Photo" class="rounded mt-2 mb-4">
+                    <img src="{{ $visitor->photo }}" alt="Visitor Photo">
                 </div>
             @endif
 

@@ -45,19 +45,18 @@
                 </thead>
                 <tbody>
                 <tr><td class="px-4 py-2 text-gray-700">Photo</td><td><img id="Photo" src="data:image/png;base64, " ></td></tr>
-                <tr><td class="px-4 py-2 text-gray-700">IdNumber</td><td><input type="text" id="IdNumber" class="w-full p-2 border border-gray-300 rounded-md" /></td></tr>
-                <tr><td class="px-4 py-2 text-gray-700">ArabicFullName</td><td><input type="text" id="arabicFullName" class="w-full p-2 border border-gray-300 rounded-md" /></td></tr>
-                <tr><td class="px-4 py-2 text-gray-700">AddressArabic</td><td><input type="text" id="addressArabic" class="w-full p-2 border border-gray-300 rounded-md" /></td></tr>
+                <tr><td class="px-4 py-2 text-gray-700">CPR Number</td><td><input type="text" id="IdNumber" class="w-full p-2 border border-gray-300 rounded-md" /></td></tr>
+                <tr><td class="px-4 py-2 text-gray-700">Full Name</td><td><input type="text" id="arabicFullName" class="w-full p-2 border border-gray-300 rounded-md" /></td></tr>
+                <tr><td class="px-4 py-2 text-gray-700">Address</td><td><input type="text" id="addressArabic" class="w-full p-2 border border-gray-300 rounded-md" /></td></tr>
                 <tr style="display: none"><td class="px-4 py-2 text-gray-700">AddressEnglish</td><td><input type="text" id="addressEnglish" class="w-full p-2 border border-gray-300 rounded-md" /></td></tr>
 
-                <tr><td class="px-4 py-2 text-gray-700">BirthDate</td><td><input type="text" id="birthDate" class="w-full p-2 border border-gray-300 rounded-md" /></td></tr>
-                <tr><td class="px-4 py-2 text-gray-700">CardCountry</td><td><input type="text" id="cardCountry" class="w-full p-2 border border-gray-300 rounded-md" /></td></tr>
-                <tr><td class="px-4 py-2 text-gray-700">CardExpiryDate</td><td><input type="text" id="cardexpiryDate" class="w-full p-2 border border-gray-300 rounded-md" /></td></tr>
+                <tr><td class="px-4 py-2 text-gray-700">Birth Date</td><td><input type="text" id="birthDate" class="w-full p-2 border border-gray-300 rounded-md" /></td></tr>
+                <tr><td class="px-4 py-2 text-gray-700">Card Country</td><td><input type="text" id="cardCountry" class="w-full p-2 border border-gray-300 rounded-md" /></td></tr>
+                <tr><td class="px-4 py-2 text-gray-700">Card Expiry Date</td><td><input type="text" id="cardexpiryDate" class="w-full p-2 border border-gray-300 rounded-md" /></td></tr>
                 <tr style="display: none"><td class="px-4 py-2 text-gray-700">CardSerialNumber</td><td><input type="text" id="cardSerialNumber" class="w-full p-2 border border-gray-300 rounded-md" /></td></tr>
                 <tr><td class="px-4 py-2 text-gray-700">Gender</td><td><input type="text" id="gender" class="w-full p-2 border border-gray-300 rounded-md" /></td></tr>
-                <tr><td class="px-4 py-2 text-gray-700">NationalityCode</td><td><input type="text" id="nationalityCode" class="w-full p-2 border border-gray-300 rounded-md" /></td></tr>
-                <tr><td class="px-4 py-2 text-gray-700">PassportNumber</td><td><input type="text" id="passportNumber" class="w-full p-2 border border-gray-300 rounded-md" /></td></tr>
-                <tr style="display: none;"><td class="px-4 py-2 text-gray-700">Photo</td><td><input type="text" id="photo" class="w-full p-2 border border-gray-300 rounded-md" /></td></tr>
+                <tr><td class="px-4 py-2 text-gray-700">Nationality Code</td><td><input type="text" id="nationalityCode" class="w-full p-2 border border-gray-300 rounded-md" /></td></tr>
+                <tr><td class="px-4 py-2 text-gray-700">Passport Number</td><td><input type="text" id="passportNumber" class="w-full p-2 border border-gray-300 rounded-md" /></td></tr>
                 </tbody>
             </table>
         </div>
@@ -122,6 +121,25 @@
 
             // Checkin Button Click
             $('#btnCheckin').click(function () {
+                const requiredFields = [
+                    { id: '#IdNumber', name: 'CPR Number' },
+                    { id: '#arabicFullName', name: 'Full Name' }
+                ];
+
+                let missingField = null;
+
+                // Check for empty fields
+                requiredFields.forEach(field => {
+                    if (!$(field.id).val() && !missingField) {
+                        missingField = field.name; // Capture the first missing field
+                    }
+                });
+
+                // If a missing field is found, show an alert and stop execution
+                if (missingField) {
+                    alert(`Please fill out "${missingField}".`);
+                    return;
+                }
                 // Get the logged-in user's ID from a meta tag or a hidden input field
                 const userId = $('meta[name="auth-user-id"]').attr('content'); // Ensure this meta tag is present in your Blade layout
 
@@ -132,7 +150,13 @@
                     birth_date: $('#birthDate').val(),
                     nationality_code: $('#nationalityCode').val(),
                     passport_number: $('#passportNumber').val(),
-                    photo: $('#Photo').attr('src')
+                    photo: $('#Photo').attr('src'),
+                    gender: $('#gender').val(),
+                    card_country: $('#cardCountry').val(),
+                    card_expiry_date: $('#cardexpiryDate').val(),
+                    card_serial_number: $('#cardSerialNumber').val(),
+                    address_arabic: $('#addressArabic').val(),
+                    address_english: $('#addressEnglish').val(),
                 };
 
                 $.ajax({

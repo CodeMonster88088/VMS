@@ -17,24 +17,47 @@ class VisitorController extends Controller
 {
     public function index(Request $request)
     {
+        $sort = $request->input('sort', 'checkin_desc'); // Default to check-in time ascending
+        $search = $request->input('search'); // Get the search input
         $query = Visitor::query();
 
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where('id_number', 'like', "%$search%")
-                ->orWhere('arabic_full_name', 'like', "%$search%");
+        // Apply search filter
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('id_number', 'like', "%{$search}%")
+                    ->orWhere('arabic_full_name', 'like', "%{$search}%");
+            });
         }
 
-        if ($request->filled('sort')) {
-            $query->orderBy('checkin_time', $request->sort);
-        } else {
-            $query->orderBy('checkin_time', 'desc'); // Default sorting
+        // Apply sorting
+        switch ($sort) {
+            case 'checkin_asc':
+                $query->orderBy('checkin_time', 'asc');
+                break;
+            case 'checkin_desc':
+                $query->orderBy('checkin_time', 'desc');
+                break;
+            case 'checkout_asc':
+                $query->orderBy('checkout_time', 'asc');
+                break;
+            case 'checkout_desc':
+                $query->orderBy('checkout_time', 'desc');
+                break;
+            case 'still_checked_in':
+                $query->whereNull('checkout_time')->orderBy('checkin_time', 'asc');
+                break;
+            default:
+                $query->orderBy('checkin_time', 'asc');
+                break;
         }
 
-        $visitors = $query->get();
+        $visitors = $query->paginate(10)->appends($request->except('page')); // Maintain query string during pagination
 
         return view('visitors.index', compact('visitors'));
     }
+
+
+
 
 
     public function edit($id, Request $request)
@@ -65,7 +88,7 @@ class VisitorController extends Controller
             'ip_address' => $request->ip(),
         ]);
 
-        return redirect()->route('home')->with('success', 'Visitor deleted successfully.');
+        return redirect()->back()->with('success', 'Visitor deleted successfully.');
     }
 
 
@@ -100,26 +123,58 @@ class VisitorController extends Controller
         ]);
 
         // Redirect back with a success message
-        return redirect()->route('visitors.index')->with('success', 'Visitor updated successfully!');
+        return redirect()->route('home')->with('success', 'Visitor updated successfully!');
     }
 
-    public function visitorLog()
+    public function visitorLog(Request $request)
     {
-        $visitors = Visitor::orderBy('checkin_time', 'desc')->get();
+        // Default sorting by check-in time descending
+        $sort = $request->input('sort', 'checkin_desc');
+        $search = $request->input('search'); // Handle search queries
+        $query = Visitor::query();
+
+        // Apply search filter
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('id_number', 'like', "%{$search}%")
+                    ->orWhere('arabic_full_name', 'like', "%{$search}%");
+            });
+        }
+
+        // Apply sorting logic
+        switch ($sort) {
+            case 'checkin_asc':
+                $query->orderBy('checkin_time', 'asc');
+                break;
+            case 'checkin_desc':
+                $query->orderBy('checkin_time', 'desc');
+                break;
+            case 'checkout_asc':
+                $query->orderBy('checkout_time', 'asc');
+                break;
+            case 'checkout_desc':
+                $query->orderBy('checkout_time', 'desc');
+                break;
+            case 'still_checked_in':
+                $query->whereNull('checkout_time')->orderBy('checkin_time', 'desc');
+                break;
+            default:
+                $query->orderBy('checkin_time', 'desc'); // Default sorting
+                break;
+        }
+
+        // Paginate visitors and maintain query string during pagination
+        $visitors = $query->paginate(10)->appends($request->except('page'));
+
         return view('home', compact('visitors'));
     }
 
+
     public function checkIn(Request $request)
     {
+        // Combine all validation into one step
         $validatedData = $request->validate([
             'user_id' => 'required|integer|exists:users,id',
-            'id_number' => 'required|string|max:255',
-            // Add other validations as needed
-        ]);
-        // Process the check-in
-        $visitor = Visitor::create($validatedData);
-
-        $validator = Validator::make($request->all(), [
             'id_number' => 'required|string|max:255',
             'photo' => 'nullable|string',
             'address_arabic' => 'nullable|string|max:255',
@@ -134,27 +189,26 @@ class VisitorController extends Controller
             'passport_number' => 'nullable|string|max:255',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json(['error' => $validator->errors()], 422);
-        }
-
+        // Create the visitor record
         $visitor = Visitor::create([
-            'id_number' => $request->id_number,
-            'photo' => $request->photo,
-            'address_arabic' => $request->address_arabic,
-            'address_english' => $request->address_english,
-            'arabic_full_name' => $request->arabic_full_name,
-            'birth_date' => $request->birth_date,
-            'card_country' => $request->card_country,
-            'card_expiry_date' => $request->card_expiry_date,
-            'card_serial_number' => $request->card_serial_number,
-            'gender' => $request->gender,
-            'nationality_code' => $request->nationality_code,
-            'passport_number' => $request->passport_number,
+            'user_id' => $validatedData['user_id'],
+            'id_number' => $validatedData['id_number'],
+            'photo' => $validatedData['photo'] ?? null,
+            'address_arabic' => $validatedData['address_arabic'] ?? null,
+            'address_english' => $validatedData['address_english'] ?? null,
+            'arabic_full_name' => $validatedData['arabic_full_name'] ?? null,
+            'birth_date' => $validatedData['birth_date'] ?? null,
+            'card_country' => $validatedData['card_country'] ?? null,
+            'card_expiry_date' => $validatedData['card_expiry_date'] ?? null,
+            'card_serial_number' => $validatedData['card_serial_number'] ?? null,
+            'gender' => $validatedData['gender'] ?? null,
+            'nationality_code' => $validatedData['nationality_code'] ?? null,
+            'passport_number' => $validatedData['passport_number'] ?? null,
             'checkin_time' => now(),
             'checkout_time' => null,
         ]);
 
+        // Log the check-in action
         ActivityLog::create([
             'user_id' => $validatedData['user_id'],
             'action' => 'Check-in',
@@ -163,8 +217,10 @@ class VisitorController extends Controller
             'ip_address' => $request->ip(),
         ]);
 
+        // Return a success response
         return response()->json(['message' => 'Visitor checked in successfully!', 'visitor' => $visitor], 201);
     }
+
 
     public function validateCheckin(Request $request)
     {

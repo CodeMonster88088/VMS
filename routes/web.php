@@ -8,7 +8,7 @@ use App\Http\Controllers\SmartcardController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth','mfa'])->group(function () {
     Route::get('/', [VisitorController::class, 'visitorLog'])->name('home');
     Route::get('/about', fn() => view('about'))->name('about');
     Route::get('/contact', fn() => view('contact'))->name('contact');
@@ -40,7 +40,7 @@ Route::post('/read-card', [SmartcardController::class, 'readCard'])->name('card.
 
 
 
-Route::middleware([\App\Http\Middleware\AdminMiddleware::class])->get('/test-admin', function () {
+Route::middleware(['admin'])->get('/test-admin', function () {
     return 'Middleware works!';
 });
 
@@ -48,8 +48,8 @@ Route::middleware([\App\Http\Middleware\AdminMiddleware::class])->get('/test-adm
 
 
 
-// User Management Routes
-route::middleware([\App\Http\Middleware\AdminMiddleware::class])->group(function () {
+// Admins routes
+route::middleware(['admin','mfa'])->group(function () {
     Route::get('/users', [AdminController::class, 'showUsersPage'])->name('users.manage');
     Route::delete('/user/{id}', [AdminController::class, 'deleteUser'])->name('delete.user');
     Route::get('/user/{id}/edit', [AdminController::class, 'editUser'])->name('edit.user');
@@ -71,7 +71,7 @@ route::middleware([\App\Http\Middleware\AdminMiddleware::class])->group(function
 Route::get('/admin/logs', function () {
     $logs = \App\Models\ActivityLog::with('user')->latest()->paginate(50);
     return view('admin.logs', compact('logs'));
-})->middleware('auth', 'isAdmin');
+})->middleware('auth', 'admin');
 
 Route::middleware('auth')->group(function () {
     Route::get('/mfa-prompt', [MFAController::class, 'showPrompt'])->name('mfa.prompt');
