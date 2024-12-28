@@ -15,18 +15,13 @@
         </div>
     @endif
 
-    @if(Auth::check())
-        <p>Logged in as: {{ Auth::user()->name }} ({{ Auth::user()->email }})</p>
-    @else
-        <p>No user is logged in.</p>
-    @endif
-
     <!-- Visitor Log -->
     <div class="mt-10">
         <h2 class="text-lg font-bold mb-4">Visitor Log</h2>
 
         <!-- Search and Sort Bar -->
         <div class="flex items-center justify-between mb-6">
+            <!-- Search Bar -->
             <form method="GET" action="{{ route('visitors.index') }}" class="flex items-center space-x-4 w-full">
                 <input
                     type="text"
@@ -42,23 +37,29 @@
                 </button>
             </form>
 
+            <!-- Sort Dropdown -->
             <form method="GET" action="{{ route('visitors.index') }}" class="ml-4">
                 <select
                     name="sort"
                     onchange="this.form.submit()"
                     class="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <option value="asc" {{ request('sort') === 'asc' ? 'selected' : '' }}>Check-in Time: Oldest</option>
-                    <option value="desc" {{ request('sort') === 'desc' ? 'selected' : '' }}>Check-in Time: Newest</option>
+                    <option value="checkin_desc" {{ request('sort', 'checkin_desc') === 'checkin_desc' ? 'selected' : '' }}>Check-in Time: Newest</option>
+                    <option value="checkin_asc" {{ request('sort') === 'checkin_asc' ? 'selected' : '' }}>Check-in Time: Oldest</option>
+                    <option value="checkout_asc" {{ request('sort') === 'checkout_asc' ? 'selected' : '' }}>Check-out Time: Oldest</option>
+                    <option value="checkout_desc" {{ request('sort') === 'checkout_desc' ? 'selected' : '' }}>Check-out Time: Newest</option>
+                    <option value="still_checked_in" {{ request('sort') === 'still_checked_in' ? 'selected' : '' }}>Still Checked-In</option>
                 </select>
             </form>
         </div>
 
-        @if(isset($visitors) && $visitors->isNotEmpty())
+
+    @if(isset($visitors) && $visitors->isNotEmpty())
             <!-- Display Visitor Log Table -->
             <table class="min-w-full bg-white shadow-md rounded overflow-hidden">
                 <thead class="bg-gray-100">
                 <tr>
-                    <th class="px-4 py-2 border-b text-left text-sm font-medium text-gray-700">ID Number</th>
+                    <th class="px-4 py-2 border-b text-left text-sm font-medium text-gray-700">ID</th>
+                    <th class="px-4 py-2 border-b text-left text-sm font-medium text-gray-700">CPR Number</th>
                     <th class="px-4 py-2 border-b text-left text-sm font-medium text-gray-700">Name</th>
                     <th class="px-4 py-2 border-b text-left text-sm font-medium text-gray-700">Check-in Time</th>
                     <th class="px-4 py-2 border-b text-left text-sm font-medium text-gray-700">Check-out Time</th>
@@ -72,6 +73,7 @@
                     <tr
                         class="hover:bg-gray-100 cursor-pointer"
                         onclick="window.location='{{ route('visitors.details', $visitor->id) }}'">
+                        <td class="px-4 py-2 border-b text-sm text-gray-700">{{ $visitor->id }}</td>
                         <td class="px-4 py-2 border-b text-sm text-gray-700">{{ $visitor->id_number }}</td>
                         <td class="px-4 py-2 border-b text-sm text-gray-700">{{ $visitor->arabic_full_name }}</td>
                         <td class="px-4 py-2 border-b text-sm text-gray-700">{{ $visitor->checkin_time ?? 'N/A' }}</td>
@@ -101,6 +103,10 @@
                 @endforeach
                 </tbody>
             </table>
+            <!-- Pagination Links -->
+            <div class="mt-4">
+                {{ $visitors->links() }}
+            </div>
         @else
             <p class="text-gray-600">No visitors found.</p>
         @endif

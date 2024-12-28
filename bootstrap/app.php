@@ -17,6 +17,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->appendToGroup('mfa',[
             \App\Http\Middleware\CheckMFA::class,
         ]);
+        $middleware->appendToGroup('admin',[
+            \App\Http\Middleware\AdminMiddleware::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

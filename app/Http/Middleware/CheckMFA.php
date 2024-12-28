@@ -12,7 +12,7 @@ class CheckMFA
         $user = Auth::user();
 
         if ($user && $user->mfa_token) {
-            return redirect()->route('auth.prompt');
+            return redirect()->route('mfa.prompt');
         }
 
         return $next($request);

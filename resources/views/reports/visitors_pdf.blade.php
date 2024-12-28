@@ -22,6 +22,11 @@
             text-align: center;
             margin-bottom: 20px;
         }
+        .arabic-text {
+            font-family: 'Amiri', 'Arial', sans-serif; /* Using Amiri with Arial fallback */
+            direction: rtl;
+            text-align: right;
+        }
     </style>
 </head>
 <body>
@@ -40,8 +45,8 @@
     @foreach ($visitors as $visitor)
         <tr>
             <td>{{ $visitor->id_number }}</td>
-            <td>{{ $visitor->arabic_full_name }}</td>
-            <td>{{ $visitor->address_arabic }}</td>
+            <td class="arabic-text">{{ $visitor->arabic_full_name }}</td>
+            <td class="arabic-text">{{ $visitor->address_arabic }}</td>
             <td>{{ $visitor->checkin_time }}</td>
             <td>{{ $visitor->checkout_time ?? 'Still Checked-in' }}</td>
         </tr>
