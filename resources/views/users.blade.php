@@ -67,6 +67,7 @@
         <table class="min-w-full bg-white shadow-md rounded">
             <thead>
             <tr>
+                <th class="px-4 py-2 border-b text-left text-sm font-medium text-gray-700">ID</th>
                 <th class="px-4 py-2 border-b text-left text-sm font-medium text-gray-700">Name</th>
                 <th class="px-4 py-2 border-b text-left text-sm font-medium text-gray-700">Email</th>
                 <th class="px-4 py-2 border-b text-left text-sm font-medium text-gray-700">Role</th>
@@ -76,6 +77,7 @@
             <tbody>
             @foreach ($users as $user)
                 <tr>
+                    <td class="px-4 py-2 border-b text-sm text-gray-700">{{ $user->id }}</td>
                     <td class="px-4 py-2 border-b text-sm text-gray-700">{{ $user->name }}</td>
                     <td class="px-4 py-2 border-b text-sm text-gray-700">{{ $user->email }}</td>
                     <td class="px-4 py-2 border-b text-sm text-gray-700">{{ $user->role }}</td>
@@ -102,6 +104,7 @@
     <table class="min-w-full bg-white shadow-md rounded">
         <thead class="bg-gray-100">
         <tr>
+            <th class="px-4 py-2">ID</th>
             <th class="px-4 py-2">User</th>
             <th class="px-4 py-2">Action</th>
             <th class="px-4 py-2">Module</th>
@@ -113,6 +116,7 @@
         <tbody>
         @foreach($logs as $log)
             <tr>
+                <td class="px-4 py-2">{{ $log->user->id}}</td>
                 <td class="px-4 py-2">{{ $log->user->name ?? 'Guest' }}</td>
                 <td class="px-4 py-2">{{ $log->action }}</td>
                 <td class="px-4 py-2">{{ $log->module }}</td>
